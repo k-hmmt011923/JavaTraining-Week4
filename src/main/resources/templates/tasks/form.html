@@ -1,30 +1,29 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::section})}">
-<section>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit} ? 'タスク編集' : 'タスク登録'">タスクフォーム</title>
+</head>
+<body>
+<h1 th:text="${isEdit} ? 'タスク編集' : 'タスク登録'">タスクフォーム</h1>
 
-  <h1 th:text="${mode == 'edit'} ? 'タスク編集' : 'タスク新規作成'">タスク新規作成</h1>
-
-  <form th:object="${taskForm}"
-        th:action="${mode == 'edit'} ? @{|/tasks/${taskId}|} : @{/tasks}"
-        method="post">
-
-    <div style="margin-bottom:12px;">
-      <div>タイトル</div>
-      <input type="text" th:field="*{title}" style="width: 260px;" />
-      <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color:red;"></div>
+<form th:action="${isEdit} ? @{/tasks/{id}(id=${taskId})} : @{/tasks}" th:object="${taskForm}" method="post">
+    <div>
+        <label for="title">タイトル</label>
+        <input type="text" id="title" th:field="*{title}">
+        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
     </div>
 
-    <div th:if="${mode == 'edit'}" style="margin-bottom:12px;">
-      <label>
-        <input type="checkbox" th:field="*{done}" />
-        完了
-      </label>
+    <div>
+        <label for="completed">完了</label>
+        <input type="checkbox" id="completed" th:field="*{completed}">
     </div>
 
-    <button type="submit" th:text="${mode == 'edit'} ? '更新' : '登録'">登録</button>
-    <a th:href="@{/tasks}">戻る</a>
-  </form>
+    <button type="submit" th:text="${isEdit} ? '更新' : '登録'">保存</button>
+</form>
 
-</section>
+<p>
+    <a th:href="@{/tasks}">一覧に戻る</a>
+</p>
+</body>
 </html>

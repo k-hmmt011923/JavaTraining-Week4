@@ -3,42 +3,48 @@ package com.example.taskapp.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails user = User.withUsername("testuser")
+                .password("{noop}password")
+                .roles("USER")
+                .build();
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**").permitAll()
-                .anyRequest().authenticated()
-        );
-
-        http.formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/tasks", true)
-                .permitAll()
-        );
-
-        http.logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-        );
-
-        // ミニマム構成：CSRFは有効（フォームPOSTにはトークンが要る）
-        return http.build();
+        return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/css/**", "/h2-console/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/tasks/**").authenticated()
+                .anyRequest().permitAll()
+                )
+                .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/tasks", true)
+                .permitAll()
+                )
+                .logout(Customizer.withDefaults())
+                .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**", "/h2-console/**")
+                )
+                .headers(headers -> headers
+                .frameOptions(frame -> frame.disable())
+                );
+
+        return http.build();
     }
 }

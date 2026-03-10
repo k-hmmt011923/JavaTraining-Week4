@@ -1,8 +1,7 @@
-package com.example.taskapp.task.repository;
+package com.example.taskapp.repository;
 
+import com.example.taskapp.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.example.taskapp.task.entity.Task;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 }

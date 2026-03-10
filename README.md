@@ -1,73 +1,222 @@
-# JavaTraining-Week7
+# JavaTraining-Final 
 
-## 機能概要
+## プロダクト概要 
 
-- Spring Security を導入し、フォームログイン機能を実装しました。
-- 認証されたユーザのみ/tasks/にアクセスできる構成とし、JUnit + MockMvc による統合テストで主要動作を確認しています。
+Spring Boot を用いたシンプルなタスク管理Webアプリです。 ユーザーはログイン後にタスクの一覧表示・登録・編集・削除・完了切替を行うことができます。 
+画面操作とREST APIの両方からタスクCRUDを実行できます。 
 
-## 起動手順
+## 開発環境 
+- JDK / Java 21 
+- フレームワーク / Spring Boot 
+- ビルドツール / Gradle 
+- IDE / VS Code 
+- DB / H2 Database 
+- テンプレートエンジン / Thymeleaf 
+- テスト / MockMvc 
 
-### 必要環境
+## セットアップ手順 
 
-・JDK 21
-・Gradle Wrapper
+- リポジトリを取得し、プロジェクト直下でアプリ起動
 
-プロジェクト直下で以下を実行してください。
+1. リポジトリの取得 
+```powershell
+git clone https://github.com/k-hmmt011923/JavaTraining-Final.git 
+```
 
-- ./gradlew bootRun
+2. プロジェクト直下へ移動 cd JavaTraining-Final 3. アプリ起動 本プロジェクトではGradle Wrapperを使用しています。 
 
-Windows環境で上記が実行できない場合
+- Mac / Linuxの場合以下をコマンドラインで実行してください。 
 
-- gradlew.bat bootRun
+```powershell
+./gradlew bootRun 
+```
 
-起動後、ブラウザで以下にアクセスしてください。
+- Windowsの場合 
+```powershell
+gradlew.bat bootRun　もしくは　.\gradlew.bat bootRun 
+```
 
-- http://localhost:8080/tasks
+- Maven（参考） 
+```powershell
+./mvnw spring-boot:run 
+```
 
-### テスト実行方法
+## 動作確認手順 
+1. ブラウザで上で以下URLへアクセス 　
 
-- ./gradlew test
+    http://localhost:8080/login 
 
-## 認証機能
 
-- ユーザ情報を H2 データベースに保存
-- UserAccountエンティティを作成
-- UserDetailsServiceを実装し DB 認証を実現
-- パスワードはBCryptで暗号化
-- 起動時に初期ユーザを登録（CommandLineRunner）
+2. ログイン情報の入力 　
 
-### ログイン方法
+   username : testuser
+   password : password 
 
-- username = testuser
-- password = password
+3. ログインが成功すると http://localhost:8080/tasks 
+   にリダイレクトされます 
 
-## Security設定
+## 画面操作 
 
-- /login と/css/ は未認証でもアクセス可能
-- /tasks/は認証必須
-- フォームログイン有効化
-- ログイン成功後 /tasks に遷移
-- ログアウト後 /login?logout に遷移
+### タスク一覧(/tasks) 
 
-## ログイン画面
+表示内容 
+タスク一覧・新規登録・ID・タイトル・完了状態・編集・完了切替・削除 
 
-- templates/login.html
-- CSRFトークン対応
-- ログイン成功・失敗メッセージ表示
-- ログアウト成功メッセージ表示
+### タスク登録(/tasks/new) 
 
-## MockMvcによる統合テスト
+タスク一覧から　「新規作成」リンクをクリック タイトルを入力し、登録する 
 
-以下の主要動作を自動テストで確認しています：
+### タスク編集(/tasks/{id}/edit) 
 
-- 認証なしで /tasks にアクセスすると /login にリダイレクトされる
-- /login は未認証でも表示可能
-- 認証済みユーザは/tasks を表示できる
-- ログイン成功時 /tasks に遷移する
-- ログイン失敗時 /login?error に遷移する
+追加したタスクの右部項目の「編集」リンクをクリック タイトルを入力し、更新する 
 
-## 工夫した点
+### タスク削除 
 
-- 段階的に認証制御を実装し、「未認証では入れない → ログイン後は入れる」を一つずつ確認しながら構築しました。
-- DB認証とBCryptによるパスワード暗号化を採用し、実務を意識した構成にしました。
-- MockMvcによる自動テストを実装し、認証制御とログイン成功・失敗の挙動を機械的に検証できるようにしました。
+タスク一覧画面から、削除したいタスクの右部項目の「削除」ボタンをクリック 
+
+### 完了状態切替 
+
+タスク一覧画面から、完了状態を切り替えたいタスクの右部項目の「完了切替」ボタンをクリック 
+
+## REST　API 
+
+このREADMEのセットアップ手順・動作確認手順にてプロジェクトの起動、ログイン認証を済ませ、タスク一覧画面(/tasks)をブラウザ上で開いた状態で行ってください。
+
+ベースのURLは /api/tasksです 
+
+コマンドラインにて例のような記述で実行してください 
+
+### タスク一覧取得 GET /api/tasks 
+
+例 
+```powershell
+curl http://localhost:8080/api/tasks
+```
+
+### タスク登録 POST /api/tasks 
+
+例 Linux/Mac
+
+```powershell
+curl -X POST http://localhost:8080/api/tasks \
+-H "Content-Type: application/json" \
+-d '{"title":"sample task","completed":false}'
+```
+
+Windows
+
+```powershell
+$json = '{"title":"sample task","completed":false}'
+curl.exe -X POST http://localhost:8080/api/tasks -H "Content-Type: application/json" -d $json
+```
+
+
+### タスク更新 PUT /api/tasks/{id} 
+
+例 
+```powershell
+curl -X PUT http://localhost:8080/api/tasks/1 \ -H "Content-Type: application/json" \ -d '{"title":"updated task","completed":true}' 
+```
+
+### タスク削除 DELETE /api/tasks/{id} 
+
+例
+```powershell
+curl -X DELETE http://localhost:8080/api/tasks/1
+```
+
+## アーキテクチャ
+
+ブラウザ
+↓
+Controller
+LoginController
+TaskViewController
+TaskRestController
+↓
+DTO / Entity
+TaskForm
+Task
+↓
+Service
+TaskService
+↓
+Repository
+TaskRepository
+↓
+Database
+H2 Database
+
+## パッケージ構成
+
+
+```powershell
+JavaTraining-Final/
+├─ src/
+│  ├─ main/
+│  │  ├─ java/com/example/taskapp/
+│  │  │  ├─ config/
+│  │  │  │   └─ SecurityConfig.java
+│  │  │  ├─ controller/
+│  │  │  │   ├─ LoginController.java
+│  │  │  │   ├─ TaskViewController.java
+│  │  │  │   └─ TaskRestController.java
+│  │  │  ├─ dto/
+│  │  │  │   └─ TaskForm.java
+│  │  │  ├─ entity/
+│  │  │  │   └─ Task.java
+│  │  │  ├─ exception/
+│  │  │  │   ├─ GlobalExceptionHandler.java
+│  │  │  │   └─ TaskNotFoundException.java
+│  │  │  ├─ repository/
+│  │  │  │   └─ TaskRepository.java
+│  │  │  ├─ service/
+│  │  │  │   └─ TaskService.java
+│  │  │  └─ TaskappApplication.java
+│  │  │
+│  │  └─ resources/
+│  │      ├─ templates/
+│  │      │  ├─ layout.html
+│  │      │  ├─ login.html
+│  │      │  ├─ error/
+│  │      │  │   └─ 404.html
+│  │      │  └─ tasks/
+│  │      │      ├─ index.html
+│  │      │      └─ form.html
+│  │      │
+│  │      └─ application.properties
+│  │
+│  └─ test/java/com/example/taskapp/controller/
+│     └─ TaskControllerTest.java
+│
+├─ screenshots/
+│  ├─ login.png
+│  ├─ list.png
+│  └─ tests.png
+│
+├─ build.gradle
+├─ gradlew
+├─ gradlew.bat
+├─ settings.gradle
+└─ README.md
+```
+
+## 既知の制約
+
+- ユーザー管理機能は未実装（単一ユーザーのみ）
+
+- UIデザインは最小構成
+
+- タスク検索機能は未実装
+
+## 今後の改善
+
+- タスク検索・ページング機能
+
+- PostgreSQL + Docker対応
+
+- OpenAPI(Swagger)によるAPI仕様公開
+
+- GitHub ActionsによるCI導入
+
+- UIデザイン改善

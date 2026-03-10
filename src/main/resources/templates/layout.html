@@ -1,29 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Task App</title>
+    <meta charset="UTF-8">
+    <title>Task App</title>
 </head>
 <body>
-
-  <h1><a th:href="@{/tasks}">Task App</a></h1>
-  <hr>
-
-  <div th:fragment="layout(content)">
-
-    <div th:if="${success}" style="padding:10px; border:1px solid #3c763d; margin:12px 0;">
-      <span th:text="${success}"></span>
-    </div>
-    <div th:if="${error}" style="padding:10px; border:1px solid #a94442; margin:12px 0;">
-      <span th:text="${error}"></span>
-    </div>
-
-    <div th:replace="${content}"></div>
-
-  </div>
-
-  <hr>
-  <p>© Task App</p>
-
+<header>
+    <h1><a th:href="@{/tasks}">Task App</a></h1>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">ログアウト</button>
+    </form>
+    <hr>
+</header>
 </body>
 </html>
